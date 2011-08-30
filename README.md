@@ -4,7 +4,7 @@ This plugin reloads external configuration files (those files added to grails.co
 
 There are several options available for configuration.  These options and their default values are shown below:
 
-'''groovy
+```groovy
 grails.plugins.reloadConfig {
 	files = []
 	includeConfigLocations = true
@@ -12,7 +12,7 @@ grails.plugins.reloadConfig {
 	enabled = true
 	notifyPlugins = []
 }
-'''
+```
 
 Each of these options are described below.
 
