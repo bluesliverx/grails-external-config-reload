@@ -62,6 +62,8 @@ grails.project.dependency.resolution = {
     }
 	plugins {
 		compile ':quartz:0.4.2'
-		runtime ':release:latest.integration'
+		runtime ':release:1.0.0.RC3' {
+			export = false
+		}
 	}
 }
