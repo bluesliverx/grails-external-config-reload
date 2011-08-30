@@ -9,3 +9,8 @@ grails {
 		}
 	}
 }
+environments {
+	test {
+		grails.plugins.reloadConfig.enabled = false
+	}
+}
