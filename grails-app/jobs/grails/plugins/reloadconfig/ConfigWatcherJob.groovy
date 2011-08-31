@@ -1,11 +1,9 @@
 package grails.plugins.reloadconfig
 
-import org.codehaus.groovy.grails.plugins.GrailsPlugin
-
 class ConfigWatcherJob {
 	static Boolean initialRun = true
 	def grailsApplication
-	def pluginManager
+	def reloadConfigService
 	
     def execute(context) {
 		// Prevents cyclic reloads when a reload is triggered
@@ -27,17 +25,13 @@ class ConfigWatcherJob {
 			File configFile = new File(fileName).absoluteFile
 			log.debug("Checking external config file location ${configFile} for changes in the last ${interval} ms ...")
 			if (configFile.exists() && (new Date().time-configFile.lastModified())<=interval) {
-				// Reload config
+				log.debug("Detected changed configuration, reloading configuration")
 				grailsApplication.config.merge(new ConfigSlurper().parse(configFile.text))
 				changed = true
 			}
 		}
 		if (changed) {
-			log.debug("Detected changed configuration, reloading configuration")
-			context.mergedJobDataMap.notifyPlugins.each { plugin ->
-				log.debug("Firing onConfigChange event for plugin ${plugin}")
-				pluginManager.getGrailsPlugin(plugin)?.notifyOfEvent(GrailsPlugin.EVENT_ON_CONFIG_CHANGE, null)
-			}
+			reloadConfigService.notifyPlugins();
 		}
 		
     }

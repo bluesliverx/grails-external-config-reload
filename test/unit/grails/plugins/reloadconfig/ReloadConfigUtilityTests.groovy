@@ -22,19 +22,14 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		def appMock = mockFor(GrailsApplication)
 		def app = appMock.createMock()
 		
-		ReloadConfigUtility.metaClass.'static'.loadConfig = { GrailsApplication application ->
-			assert application
-			assertSame app, application
-			def config = new ConfigObject()
-			config.putAll([enabled:false])
-			return config
-		}
+		def config = new ConfigObject()
+		config.putAll([enabled:false])
 		boolean watcherScheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			watcherScheduled = true
 		}
 		
-		ReloadConfigUtility.configureWatcher(app)
+		ReloadConfigUtility.configureWatcher(config, app)
 		appMock.verify()
 		assertFalse watcherScheduled
     }
@@ -48,28 +43,21 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		}
 		def app = appMock.createMock()
 		
-		ReloadConfigUtility.metaClass.'static'.loadConfig = { GrailsApplication application ->
-			assert application
-			assertSame app, application
-			def config = new ConfigObject()
-			config.putAll([enabled:true, files:[], interval:1000, includeConfigLocations:true, notifyPlugins:["test-plugin"]])
-			return config
-		}
+		def config = new ConfigObject()
+		config.putAll([enabled:true, files:[], interval:1000, includeConfigLocations:true, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 3, params.size()
+			assertEquals 2, params.size()
 			assertEquals 1000, params.interval
-			assertEquals 1, params.notifyPlugins.size()
-			assertEquals "test-plugin", params.notifyPlugins[0]
 			assertEquals 1, params.files.size()
 			assertEquals "file:./test.groovy", params.files[0]
 			watcherScheduled = true
 		}
 		
-		ReloadConfigUtility.configureWatcher(app)
+		ReloadConfigUtility.configureWatcher(config, app)
 		appMock.verify()
 		assertTrue watcherScheduled
     }
@@ -78,28 +66,21 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		def appMock = mockFor(GrailsApplication)
 		def app = appMock.createMock()
 		
-		ReloadConfigUtility.metaClass.'static'.loadConfig = { GrailsApplication application ->
-			assert application
-			assertSame app, application
-			def config = new ConfigObject()
-			config.putAll([enabled:true, files:["file:./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
-			return config
-		}
+		def config = new ConfigObject()
+		config.putAll([enabled:true, files:["file:./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 3, params.size()
+			assertEquals 2, params.size()
 			assertEquals 1000, params.interval
-			assertEquals 1, params.notifyPlugins.size()
-			assertEquals "test-plugin", params.notifyPlugins[0]
 			assertEquals 1, params.files.size()
 			assertEquals "file:./file.groovy", params.files[0]
 			watcherScheduled = true
 		}
 		
-		ReloadConfigUtility.configureWatcher(app)
+		ReloadConfigUtility.configureWatcher(config, app)
 		appMock.verify()
 		assertTrue watcherScheduled
     }
@@ -108,28 +89,21 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		def appMock = mockFor(GrailsApplication)
 		def app = appMock.createMock()
 		
-		ReloadConfigUtility.metaClass.'static'.loadConfig = { GrailsApplication application ->
-			assert application
-			assertSame app, application
-			def config = new ConfigObject()
-			config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
-			return config
-		}
+		def config = new ConfigObject()
+		config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 3, params.size()
+			assertEquals 2, params.size()
 			assertEquals 1000, params.interval
-			assertEquals 1, params.notifyPlugins.size()
-			assertEquals "test-plugin", params.notifyPlugins[0]
 			assertEquals 1, params.files.size()
 			assertEquals "./file.groovy", params.files[0]
 			watcherScheduled = true
 		}
 		
-		ReloadConfigUtility.configureWatcher(app, true)
+		ReloadConfigUtility.configureWatcher(config, app, true)
 		appMock.verify()
 		assertTrue watcherScheduled
     }
@@ -142,23 +116,17 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		}
 		def app = appMock.createMock()
 		
-		ReloadConfigUtility.metaClass.'static'.loadConfig = { GrailsApplication application ->
-			assert application
-			assertSame app, application
-			def config = new ConfigObject()
-			config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
-			return config
-		}
+		
+		def config = new ConfigObject()
+		config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
 		boolean watcherUnscheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 3, params.size()
+			assertEquals 2, params.size()
 			assertEquals 1000, params.interval
-			assertEquals 1, params.notifyPlugins.size()
-			assertEquals "test-plugin", params.notifyPlugins[0]
 			assertEquals 1, params.files.size()
 			assertEquals "./file.groovy", params.files[0]
 			watcherScheduled = true
@@ -175,7 +143,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		}
 		applicationContext.registerMockBean("quartzScheduler", quartzMock.createMock())
 		
-		ReloadConfigUtility.configureWatcher(app, true, applicationContext)
+		ReloadConfigUtility.configureWatcher(config, app, true, applicationContext)
 		appMock.verify()
 		assertTrue watcherScheduled
 		assertFalse watcherUnscheduled
@@ -190,23 +158,17 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		}
 		def app = appMock.createMock()
 		
-		ReloadConfigUtility.metaClass.'static'.loadConfig = { GrailsApplication application ->
-			assert application
-			assertSame app, application
-			def config = new ConfigObject()
-			config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
-			return config
-		}
+		
+		def config = new ConfigObject()
+		config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
 		boolean watcherUnscheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 3, params.size()
+			assertEquals 2, params.size()
 			assertEquals 1000, params.interval
-			assertEquals 1, params.notifyPlugins.size()
-			assertEquals "test-plugin", params.notifyPlugins[0]
 			assertEquals 1, params.files.size()
 			assertEquals "./file.groovy", params.files[0]
 			watcherScheduled = true
@@ -230,7 +192,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		}
 		applicationContext.registerMockBean("quartzScheduler", quartzMock.createMock())
 		
-		ReloadConfigUtility.configureWatcher(app, true, applicationContext)
+		ReloadConfigUtility.configureWatcher(config, app, true, applicationContext)
 		appMock.verify()
 		assertTrue watcherScheduled
 		assertTrue watcherUnscheduled
@@ -246,23 +208,17 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		}
 		def app = appMock.createMock()
 		
-		ReloadConfigUtility.metaClass.'static'.loadConfig = { GrailsApplication application ->
-			assert application
-			assertSame app, application
-			def config = new ConfigObject()
-			config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
-			return config
-		}
+		
+		def config = new ConfigObject()
+		config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
 		boolean watcherUnscheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 3, params.size()
+			assertEquals 2, params.size()
 			assertEquals 1000, params.interval
-			assertEquals 1, params.notifyPlugins.size()
-			assertEquals "test-plugin", params.notifyPlugins[0]
 			assertEquals 1, params.files.size()
 			assertEquals "./file.groovy", params.files[0]
 			watcherScheduled = true
@@ -286,7 +242,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		}
 		applicationContext.registerMockBean("quartzScheduler", quartzMock.createMock())
 		
-		ReloadConfigUtility.configureWatcher(app, true, applicationContext)
+		ReloadConfigUtility.configureWatcher(config, app, true, applicationContext)
 		appMock.verify()
 		assertTrue watcherScheduled
 		assertTrue watcherUnscheduled

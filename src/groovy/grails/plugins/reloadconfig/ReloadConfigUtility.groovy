@@ -28,8 +28,7 @@ class ReloadConfigUtility {
 		return config;
 	}
 	
-	public static void configureWatcher(application, boolean restart=false, context=null) {
-		def reloadConf = loadConfig(application)
+	public static void configureWatcher(ConfigObject reloadConf, application, boolean restart=false, context=null) {
 		if (context) {
 			// Remove schedule if already scheduled
 			def configWatcherClass = application.getTaskClass("grails.plugins.reloadconfig.ConfigWatcherJob")
@@ -53,8 +52,7 @@ class ReloadConfigUtility {
 			def interval = reloadConf.interval
 			ConfigWatcherJob.schedule(interval, -1, [
 				interval:interval,
-				files:files,
-				notifyPlugins:reloadConf.notifyPlugins
+				files:files
 			])
 		} else {
 			log.info "Not watching configuration files"

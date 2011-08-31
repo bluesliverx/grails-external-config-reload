@@ -12,12 +12,13 @@ class ExternalConfigReloadGrailsPlugin {
     
 	// the other plugins this plugin depends on
     def dependsOn = [quartz:"0.4.2"]
-	def loadAfter = ["core", "quartz"]
+	def loadAfter = ["core", "services", "quartz"]
 	
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp",
 			"test-config.groovy",
+			"test/**",
     ]
 	
 	def watchedResources = [
@@ -48,26 +49,54 @@ Please note: No warranty is implied or given with this plugin.
     }
 
     def doWithSpring = {
+		def reloadConf = ReloadConfigUtility.loadConfig(application)
+		configureServiceBean.delegate = delegate
+		configureServiceBean(reloadConf)
     }
 
     def doWithDynamicMethods = { ctx ->
     }
 
     def doWithApplicationContext = { applicationContext ->
-		ReloadConfigUtility.configureWatcher(application)
+		def reloadConf = ReloadConfigUtility.loadConfig(application)
+		ReloadConfigUtility.configureWatcher(reloadConf, application)
     }
 
     def onChange = { event ->
-        // Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-		if (event.source && event.source.name=="grails.plugins.reloadconfig.ConfigWatcherJob") {
-			ReloadConfigUtility.configureWatcher(event.application, true)
+		if (!event.source)
+			return
+		// Reload config service
+		if (event.source.name=="grails.plugins.reloadconfig.ReloadConfigService") {
+			def reloadConf = ReloadConfigUtility.loadConfig(event.application)
+			def beans = beans {
+				configureServiceBean.delegate = delegate
+				configureServiceBean(reloadConf)
+			}
+			event.ctx.registerBeanDefinition("reloadConfigService", beans.getBeanDefinition("reloadConfigService"))
+		}
+		// Reload config watcher
+		if (event.source.name=="grails.plugins.reloadconfig.ConfigWatcherJob") {
+			def reloadConf = ReloadConfigUtility.loadConfig(event.application)
+			ReloadConfigUtility.configureWatcher(reloadConf, event.application, true)
 		}
     }
 
     def onConfigChange = { event ->
-		// Reload config watcher - for development help only
-		ReloadConfigUtility.configureWatcher(event.application, true, event.ctx)
+		// Reload config service and watcher job
+		def reloadConf = ReloadConfigUtility.loadConfig(event.application)
+		def beans = beans {
+			configureServiceBean.delegate = delegate
+			configureServiceBean(reloadConf)
+		}
+		event.ctx.registerBeanDefinition("reloadConfigService", beans.getBeanDefinition("reloadConfigService"))
+		ReloadConfigUtility.configureWatcher(reloadConf, event.application, true, event.ctx)
+    }
+	
+	def configureServiceBean = { reloadConf ->
+		reloadConfigService(ReloadConfigService) {bean ->
+            bean.autowire = "byName"
+            bean.scope = "singleton"
+			plugins = reloadConf.notifyPlugins
+        }
     }
 }
