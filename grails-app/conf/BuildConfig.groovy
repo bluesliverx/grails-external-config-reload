@@ -3,6 +3,8 @@ grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
+grails.release.scm.enabled = false
+
 // Code Narc
 codenarc.reports = {
 	XmlReport('xml') {
@@ -62,7 +64,7 @@ grails.project.dependency.resolution = {
     }
 	plugins {
 		compile ':quartz:0.4.2'
-		runtime ':release:1.0.0.RC3' {
+		runtime (':release:1.0.0.RC3') {
 			export = false
 		}
 	}
