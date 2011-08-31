@@ -64,7 +64,15 @@ grails.project.dependency.resolution = {
     }
 	plugins {
 		compile ':quartz:0.4.2'
-		runtime (':release:1.0.0.RC3') {
+		
+		// Not exported
+		test ':code-coverage:1.2.4', {
+			export = false
+		}
+		test ':codenarc:0.15', {
+			export = false
+		}
+		build (':release:1.0.0.RC3') {
 			export = false
 		}
 	}
