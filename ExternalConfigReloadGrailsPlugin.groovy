@@ -24,12 +24,16 @@ class ExternalConfigReloadGrailsPlugin {
 		"file:./grails-app/jobs/**/ConfigWatcherJob.groovy",
 	]
 
+	// Release information
 	def license = "APACHE"
 	def organization = [ name:"Adaptive Computing", url:"http://adaptivecomputing.com" ]
+	def issueManagement = [ system:"GitHub", url:"http://github.com/adaptivecomputing/grails-external-config-reload/issues" ]
+	def scm = [ url:"http://github.com/adaptivecomputing/grails-external-config-reload" ]
+	
     def author = "Brian Saville"
     def authorEmail = "bsaville@adaptivecomputing.com"
     def title = "External Configuration Reload"
-    def description = '''\\
+    def description = '''\
 This plugin will poll for changes to external configuration files (files added to grails.config.locations), reload
 the configuration when a change has occurred, and notify specified plugins by firing the onConfigChange event in each.
 This plugin, unlike reloadable config (http://www.grails.org/plugin/reloadable-config), depends on Quartz.
