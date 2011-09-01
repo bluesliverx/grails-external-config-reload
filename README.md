@@ -2,16 +2,14 @@ This plugin reloads external configuration files (those files added to grails.co
 
 ## Configuration
 
-There are several options available for configuration.  These options and their default values are shown below:
+There are several options available for configuration that can be placed in Config.groovy.  These options and their default values are shown below:
 
 ```groovy
-grails.plugins.reloadConfig {
-	files = []
-	includeConfigLocations = true
-	interval = 5000
-	enabled = true
-	notifyPlugins = []
-}
+grails.plugins.reloadConfig.files = []
+grails.plugins.reloadConfig.includeConfigLocations = true
+grails.plugins.reloadConfig.interval = 5000
+grails.plugins.reloadConfig.enabled = true
+grails.plugins.reloadConfig.notifyPlugins = []
 ```
 
 Each of these options are described below.
