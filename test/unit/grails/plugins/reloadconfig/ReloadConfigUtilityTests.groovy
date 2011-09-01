@@ -163,7 +163,6 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
-		boolean watcherUnscheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
@@ -172,11 +171,6 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 			assertEquals 1, params.files.size()
 			assertEquals "./file.groovy", params.files[0]
 			watcherScheduled = true
-		}
-		ConfigWatcherJob.metaClass.'static'.unschedule = { String name ->
-			assertEquals "triggerName", name
-			watcherUnscheduled = true
-			return true
 		}
 		
 		def triggerMock = mockFor(SimpleTrigger)
@@ -190,12 +184,16 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 			assertEquals "GRAILS_JOBS", group
 			return [triggerMock.createMock()] as Trigger[]
 		}
+		quartzMock.demand.unscheduleJob { String triggerName, String groupName ->
+			assertEquals "triggerName", triggerName
+			assertEquals "GRAILS_TRIGGERS", groupName
+			return true	
+		}
 		applicationContext.registerMockBean("quartzScheduler", quartzMock.createMock())
 		
 		ReloadConfigUtility.configureWatcher(config, app, true, applicationContext)
 		appMock.verify()
 		assertTrue watcherScheduled
-		assertTrue watcherUnscheduled
 		quartzMock.verify()
 		triggerMock.verify()
     }
@@ -213,7 +211,6 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
 		
 		boolean watcherScheduled = false
-		boolean watcherUnscheduled = false
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
@@ -222,11 +219,6 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 			assertEquals 1, params.files.size()
 			assertEquals "./file.groovy", params.files[0]
 			watcherScheduled = true
-		}
-		ConfigWatcherJob.metaClass.'static'.unschedule = { String name ->
-			assertEquals "triggerName", name
-			watcherUnscheduled = true
-			return false
 		}
 		
 		def triggerMock = mockFor(SimpleTrigger)
@@ -240,12 +232,16 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 			assertEquals "GRAILS_JOBS", group
 			return [triggerMock.createMock()] as Trigger[]
 		}
+		quartzMock.demand.unscheduleJob { String triggerName, String groupName ->
+			assertEquals "triggerName", triggerName
+			assertEquals "GRAILS_TRIGGERS", groupName
+			return false	
+		}
 		applicationContext.registerMockBean("quartzScheduler", quartzMock.createMock())
 		
 		ReloadConfigUtility.configureWatcher(config, app, true, applicationContext)
 		appMock.verify()
 		assertTrue watcherScheduled
-		assertTrue watcherUnscheduled
 		quartzMock.verify()
 		triggerMock.verify()
     }
