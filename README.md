@@ -33,3 +33,21 @@ If set to false, this will disable the polling job completely.  This may be used
 ### Notify Plugins
 
 This option is a list of plugin names (as in \["external-config-reload"\]) that should be notified when a configuration file has been modified.  This will fire the onConfigChange event for each plugin individually in the order that they are specified.  The default is not to notify any plugins.
+
+
+## Service
+
+There is a ReloadConfigService that can be used to notify plugins of configuration changes on demand.  To use it, simply declare it and call notifyPlugins on it:
+
+```groovy
+class SomeService {
+	def reloadConfigService
+	
+	def serviceMethod() {
+		// Some logic here...
+		reloadConfigService.notifyPlugins()
+	}
+}
+```
+
+This works exactly the same as if the configuration were changed, but no new configuration is loaded with this method.  The onConfigChange event for each plugin specified in the configuration is called.
