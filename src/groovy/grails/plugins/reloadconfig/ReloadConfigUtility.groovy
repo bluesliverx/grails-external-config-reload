@@ -4,6 +4,7 @@ import grails.util.Environment
 import groovy.util.ConfigObject;
 import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.apache.log4j.Logger
+import org.codehaus.groovy.grails.plugins.quartz.GrailsTaskClassProperty as GTCP
 
 class ReloadConfigUtility {
 	private static Logger log = Logger.getLogger(this)
@@ -34,7 +35,8 @@ class ReloadConfigUtility {
 			def configWatcherClass = application.getTaskClass("grails.plugins.reloadconfig.ConfigWatcherJob")
 			def quartzScheduler = context.getBean("quartzScheduler")
 			quartzScheduler.getTriggersOfJob(configWatcherClass.fullName, configWatcherClass.group)?.each { trigger ->
-				if (ConfigWatcherJob.unschedule(trigger.name))
+				// Don't use Job.unschedule method as it has problems with grails 1.2.5
+				if (quartzScheduler.unscheduleJob(trigger.name, GTCP.DEFAULT_TRIGGERS_GROUP))
 					log.info "Stopped configuration file watcher"
 			}
 			

@@ -33,6 +33,5 @@ class ConfigWatcherJob {
 		if (changed) {
 			reloadConfigService.notifyPlugins();
 		}
-		
     }
 }
