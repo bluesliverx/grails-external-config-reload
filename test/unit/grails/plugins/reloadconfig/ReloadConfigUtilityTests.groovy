@@ -36,11 +36,6 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 
     void testConfigureWatcherNoFilesIncludeConfigLocations() {
 		def appMock = mockFor(GrailsApplication)
-		appMock.demand.getConfig(2..2) { ->
-			def config = new ConfigObject()
-			config.putAll([grails:[config:[locations:["file:./test.groovy"]]]])
-			return config
-		}
 		def app = appMock.createMock()
 		
 		def config = new ConfigObject()
@@ -50,10 +45,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 2, params.size()
-			assertEquals 1000, params.interval
-			assertEquals 1, params.files.size()
-			assertEquals "file:./test.groovy", params.files[0]
+			assertEquals 0, params.size()
 			watcherScheduled = true
 		}
 		
@@ -73,10 +65,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 2, params.size()
-			assertEquals 1000, params.interval
-			assertEquals 1, params.files.size()
-			assertEquals "file:./file.groovy", params.files[0]
+			assertEquals 0, params.size()
 			watcherScheduled = true
 		}
 		
@@ -96,10 +85,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 2, params.size()
-			assertEquals 1000, params.interval
-			assertEquals 1, params.files.size()
-			assertEquals "./file.groovy", params.files[0]
+			assertEquals 0, params.size()
 			watcherScheduled = true
 		}
 		
@@ -125,10 +111,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 2, params.size()
-			assertEquals 1000, params.interval
-			assertEquals 1, params.files.size()
-			assertEquals "./file.groovy", params.files[0]
+			assertEquals 0, params.size()
 			watcherScheduled = true
 		}
 		ConfigWatcherJob.metaClass.'static'.unschedule = { String name ->
@@ -151,13 +134,12 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
     }
 
     void testConfigureWatcherWithContext() {		
-		def appMock = mockFor(GrailsApplication)
+		def appMock = mockFor(DefaultGrailsApplication)
 		appMock.demand.getTaskClass { String className ->
 			assertEquals "grails.plugins.reloadconfig.ConfigWatcherJob", className
 			return new DefaultGrailsTaskClass(ConfigWatcherJob)
 		}
 		def app = appMock.createMock()
-		
 		
 		def config = new ConfigObject()
 		config.putAll([enabled:true, files:["./file.groovy"], interval:1000, includeConfigLocations:false, notifyPlugins:["test-plugin"]])
@@ -166,10 +148,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 2, params.size()
-			assertEquals 1000, params.interval
-			assertEquals 1, params.files.size()
-			assertEquals "./file.groovy", params.files[0]
+			assertEquals 0, params.size()
 			watcherScheduled = true
 		}
 		
@@ -199,7 +178,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
     }
 
     void testConfigureWatcherWithContextUnscheduleFail() {		
-		def appMock = mockFor(GrailsApplication)
+		def appMock = mockFor(DefaultGrailsApplication)
 		appMock.demand.getTaskClass { String className ->
 			assertEquals "grails.plugins.reloadconfig.ConfigWatcherJob", className
 			return new DefaultGrailsTaskClass(ConfigWatcherJob)
@@ -214,10 +193,7 @@ class ReloadConfigUtilityTests extends GrailsUnitTestCase {
 		ConfigWatcherJob.metaClass.'static'.schedule = { long interval, int repeatCount, Map params ->
 			assertEquals 1000, interval
 			assertEquals(-1, repeatCount)
-			assertEquals 2, params.size()
-			assertEquals 1000, params.interval
-			assertEquals 1, params.files.size()
-			assertEquals "./file.groovy", params.files[0]
+			assertEquals 0, params.size()
 			watcherScheduled = true
 		}
 		

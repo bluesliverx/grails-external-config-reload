@@ -48,14 +48,8 @@ class ReloadConfigUtility {
 				log.info "Restarting configuration file watcher"
 			else
 				log.info "Starting configuration file watcher"
-			def files = reloadConf.files
-			if (reloadConf.includeConfigLocations && application.config.grails.config.locations)
-				files.addAll(application.config.grails.config.locations)
 			def interval = reloadConf.interval
-			ConfigWatcherJob.schedule(interval, -1, [
-				interval:interval,
-				files:files
-			])
+			ConfigWatcherJob.schedule(interval, -1, [:])
 		} else {
 			log.info "Not watching configuration files"
 		}

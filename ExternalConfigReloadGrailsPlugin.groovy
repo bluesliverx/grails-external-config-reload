@@ -17,6 +17,7 @@ class ExternalConfigReloadGrailsPlugin {
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp",
+			"**/Test*",
 			"test-config.groovy",
 			"test/**",
     ]
@@ -51,7 +52,7 @@ Please note: No warranty is implied or given with this plugin.
     def doWithSpring = {
 		def reloadConf = ReloadConfigUtility.loadConfig(application)
 		configureServiceBean.delegate = delegate
-		configureServiceBean(reloadConf)
+		configureServiceBean(reloadConf, application)
     }
 
     def doWithDynamicMethods = { ctx ->
@@ -70,7 +71,7 @@ Please note: No warranty is implied or given with this plugin.
 			def reloadConf = ReloadConfigUtility.loadConfig(event.application)
 			def beans = beans {
 				configureServiceBean.delegate = delegate
-				configureServiceBean(reloadConf)
+				configureServiceBean(reloadConf, event.application)
 			}
 			event.ctx.registerBeanDefinition("reloadConfigService", beans.getBeanDefinition("reloadConfigService"))
 		}
@@ -86,17 +87,22 @@ Please note: No warranty is implied or given with this plugin.
 		def reloadConf = ReloadConfigUtility.loadConfig(event.application)
 		def beans = beans {
 			configureServiceBean.delegate = delegate
-			configureServiceBean(reloadConf)
+			configureServiceBean(reloadConf, event.application)
 		}
 		event.ctx.registerBeanDefinition("reloadConfigService", beans.getBeanDefinition("reloadConfigService"))
 		ReloadConfigUtility.configureWatcher(reloadConf, event.application, true, event.ctx)
     }
 	
-	def configureServiceBean = { reloadConf ->
+	def configureServiceBean = { reloadConf, application ->
+		def watchedFiles = reloadConf.files
+		if (reloadConf.includeConfigLocations && application.config.grails.config.locations)
+			watchedFiles.addAll(application.config.grails.config.locations)
 		reloadConfigService(ReloadConfigService) {bean ->
             bean.autowire = "byName"
             bean.scope = "singleton"
 			plugins = reloadConf.notifyPlugins
+			files = watchedFiles
+			lastTimeChecked = new Date()
         }
     }
 }
