@@ -37,7 +37,7 @@ This option is a list of plugin names (as in \["external-config-reload"\]) that 
 
 ## Service
 
-There is a ReloadConfigService that can be used to notify plugins of configuration changes on demand.  To use it, simply declare it and call notifyPlugins on it:
+There is a ReloadConfigService that can be used to trigger config reload events on demand.  To use it, simply declare it and call the methods on it:
 
 ```groovy
 class SomeService {
@@ -45,9 +45,21 @@ class SomeService {
 	
 	def serviceMethod() {
 		// Some logic here...
+		
+		reloadConfigService.checkNow()
+		// OR...
+		reloadConfigService.reloadNow()
+		// OR...
 		reloadConfigService.notifyPlugins()
 	}
 }
 ```
 
+### Check Now
+This triggers a check to be run on all watched files.  If a file has been modified, it will be merged into the current configuration, and plugins will then be notified.
+
+### Reload Now
+This triggers a manual reload.  All configuration files that are being watched will be reloaded and merged into the current configuration, and plugins will be notified.
+
+### Notify Plugins
 This works exactly the same as if the configuration were changed, but no new configuration is loaded with this method.  The onConfigChange event for each plugin specified in the configuration is called.
