@@ -63,3 +63,22 @@ This triggers a manual reload.  All configuration files that are being watched w
 
 ### Notify Plugins
 This works exactly the same as if the configuration were changed, but no new configuration is loaded with this method.  The onConfigChange event for each plugin specified in the configuration is called.
+
+
+## Release Notes
+
+### 0.4.5
+
+* Fixed #1
+* Implemented reloadNow() and checkNow() on reload config service.
+* Improved last update time checking to not use simply the job interval anymore
+
+### 0.4.3
+
+* Added service to notify plugins on demand (outside of the configuration changes)
+* Updated docs to show how to set correct configuration options
+* Verified compatibility with Grails 1.2 and 2.0.0.M1
+
+#### 0.4.1
+
+Initial public release
