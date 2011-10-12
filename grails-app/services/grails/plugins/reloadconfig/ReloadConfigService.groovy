@@ -1,6 +1,7 @@
 package grails.plugins.reloadconfig
 
 import org.codehaus.groovy.grails.plugins.GrailsPlugin
+import grails.util.Environment
 
 class ReloadConfigService {
 	def pluginManager
@@ -36,7 +37,7 @@ class ReloadConfigService {
 			log.debug("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
 			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
 				log.debug("Detected changed configuration, reloading configuration")
-				grailsApplication.config.merge(new ConfigSlurper().parse(configFile.text))
+				grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
 				changed = true
 			}
 		}
