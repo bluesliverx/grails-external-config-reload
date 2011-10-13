@@ -67,6 +67,14 @@ This works exactly the same as if the configuration were changed, but no new con
 
 ## Release Notes
 
+### 0.4.7
+
+* Fixed #2 for manual reloading
+
+### 0.4.6
+
+* Fixed #2 for periodic reloading
+
 ### 0.4.5
 
 * Fixed #1
