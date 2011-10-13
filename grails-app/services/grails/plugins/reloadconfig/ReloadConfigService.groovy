@@ -59,7 +59,7 @@ class ReloadConfigService {
 			File configFile = new File(fileName).absoluteFile
 			if (configFile.exists()) {
 				log.debug("Reloading ${configFile} manually")
-				grailsApplication.config.merge(new ConfigSlurper().parse(configFile.text))
+				grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
 			} else {
 				log.warn("File ${configFile} does not exist, cannot reload")
 			}
