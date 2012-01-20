@@ -1,6 +1,7 @@
 package grails.plugins.reloadconfig
 
 class ConfigWatcherJob {
+	static triggers = {}
 	static Boolean initialRun = true
 	def reloadConfigService
 	
