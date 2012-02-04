@@ -67,6 +67,10 @@ This works exactly the same as if the configuration were changed, but no new con
 
 ## Release Notes
 
+### 0.4.9
+
+* Updated dependency declaration for xom (1.2 was apparently removed from some repositories)
+
 ### 0.4.8
 
 * Small bug fix for warnings in the log file
