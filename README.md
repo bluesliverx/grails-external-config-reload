@@ -1,4 +1,4 @@
-This plugin reloads external configuration files (those files added to grails.config.locations or additional arbitrary ones) based on a Quartz job and then notifies any plugin specified of updates to the config files by firing the onConfigChange event.
+This plugin reloads external configuration files (those files added to grails.config.locations or additional arbitrary ones) based on a timer and then notifies any plugin specified of updates to the config files by firing the onConfigChange event.
 
 ## Configuration
 
@@ -66,6 +66,10 @@ This works exactly the same as if the configuration were changed, but no new con
 
 
 ## Release Notes
+
+### 0.5.0
+
+* Fixed #3 - Removed quartz dependency and used simple timers instead for scheduling the checkNow call
 
 ### 0.4.9
 
