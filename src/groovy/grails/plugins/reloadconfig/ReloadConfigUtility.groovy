@@ -4,7 +4,6 @@ import grails.util.Environment
 import groovy.util.ConfigObject;
 import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.plugins.quartz.GrailsTaskClassProperty as GTCP
 
 class ReloadConfigUtility {
 	private static Logger log = Logger.getLogger(this)
@@ -29,29 +28,24 @@ class ReloadConfigUtility {
 		return config;
 	}
 	
-	public static void configureWatcher(ConfigObject reloadConf, application, boolean restart=false, context=null) {
-		if (context) {
-			// Remove schedule if already scheduled
-			def configWatcherClass = application.getTaskClass("grails.plugins.reloadconfig.ConfigWatcherJob")
-			def quartzScheduler = context.getBean("quartzScheduler")
-			quartzScheduler.getTriggersOfJob(configWatcherClass.fullName, configWatcherClass.group)?.each { trigger ->
-				// Don't use Job.unschedule method as it has problems with grails 1.2.5
-				if (quartzScheduler.unscheduleJob(trigger.name, GTCP.DEFAULT_TRIGGERS_GROUP))
-					log.info "Stopped configuration file watcher"
-			}
-			
-			// Set the initial run to prevent cyclic loading
-			ConfigWatcherJob.initialRun = true
-		}
+	public static void configureWatcher(ConfigObject reloadConf, application, boolean restart=false) {
+		def reloadConfigService = application.mainContext.getBean("reloadConfigService")
 		if (reloadConf.enabled) {
+			def interval = reloadConf.interval
+			if (!reloadConfigService.timer) {
+				reloadConfigService.timer = new ReloadableTimer()
+				reloadConfigService.timer.runnable = { reloadConfigService.checkNow() }
+			}
 			if (restart)
 				log.info "Restarting configuration file watcher"
 			else
 				log.info "Starting configuration file watcher"
-			def interval = reloadConf.interval
-			ConfigWatcherJob.schedule(interval, -1, [:])
+			if (reloadConfigService.timer.reschedule(interval))
+				log.info "Stopped and restarted configuration file watcher"
 		} else {
 			log.info "Not watching configuration files"
+			if (reloadConfigService.timer?.cancelSchedule())
+				log.info "Stopped configuration file watcher"
 		}
 	}
 }

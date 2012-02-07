@@ -8,6 +8,7 @@ class ReloadConfigService {
 	def grailsApplication
 	List files
 	Date lastTimeChecked
+	ReloadableTimer timer
 
 	// Notify plugins list - add external-config-reload automatically	
 	private def plugins

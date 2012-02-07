@@ -16,9 +16,6 @@ codenarc.reports = {
 		title = 'External Config Reload Plugin Report'
 	}
 }
-codenarc.extraIncludeDirs = [
-	'grails-app/jobs',
-]
 
 // Cobertura config (code coverage)
 coverage {
@@ -30,9 +27,6 @@ coverage {
 		'**/org/grails/tomcat/**',
 		"**/*Test*",
 		"**/test/**",
-	]
-	sourceInclusions = [
-		'grails-app/jobs',
 	]
 }
 
@@ -63,9 +57,7 @@ grails.project.dependency.resolution = {
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
-	plugins {
-		compile ':quartz:0.4.2'
-		
+	plugins {		
 		// Not exported
 		test ':code-coverage:1.2.4', {
 			export = false
@@ -73,7 +65,7 @@ grails.project.dependency.resolution = {
 		test ':codenarc:0.15', {
 			export = false
 		}
-		build (':release:1.0.0.RC3') {
+		build (':release:1.0.1') {
 			export = false
 		}
 	}
