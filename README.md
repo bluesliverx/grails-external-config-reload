@@ -67,7 +67,7 @@ This works exactly the same as if the configuration were changed, but no new con
 
 ## Release Notes
 
-### 0.5.0
+### 1.0.0
 
 * Fixed #3 - Removed quartz dependency and used simple timers instead for scheduling the checkNow call
 
