@@ -37,7 +37,7 @@ class ReloadConfigService {
 			File configFile = new File(fileName).absoluteFile
 			log.debug("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
 			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
-				log.debug("Detected changed configuration, reloading configuration")
+				log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
 				grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
 				changed = true
 			}
@@ -53,7 +53,7 @@ class ReloadConfigService {
 	}
 	
 	def reloadNow() {
-		log.debug("Reload now triggered")
+		log.info("Manual reload of configuration files triggered")
 		files?.each { String fileName ->
 			if (fileName.contains("file:"))
 				fileName = fileName.substring(fileName.indexOf(':')+1)
