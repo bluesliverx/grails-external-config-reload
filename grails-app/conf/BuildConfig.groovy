@@ -69,10 +69,10 @@ grails.project.dependency.resolution = {
 		test ':codenarc:0.15', {
 			export = false
 		}
-		test ':spock:0.5-groovy-1.7', {
+		test ':spock:0.6', {
 			export = false
 		}
-		build (':release:1.0.1') {
+		build (':release:2.0.0.BUILD-SNAPSHOT') {
 			export = false
 			excludes "svn"
 		}
