@@ -67,6 +67,10 @@ This works exactly the same as if the configuration were changed, but no new con
 
 ## Release Notes
 
+### 1.0.1
+
+* Fixed #5 - Changed log levels so that info would catch reload events and changed configuration files
+
 ### 1.0.0
 
 * Fixed #3 - Removed quartz dependency and used simple timers instead for scheduling the checkNow call
