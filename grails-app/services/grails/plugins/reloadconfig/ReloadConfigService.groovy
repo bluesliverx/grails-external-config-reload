@@ -18,11 +18,11 @@ class ReloadConfigService {
 			this.plugins << "external-config-reload"
 	}
 
-    def notifyPlugins() {
-		log.debug("Notifying ${plugins.size()} plugins")
+    def notifyPlugins(List changedFiles=null) {
+		log.debug("Notifying ${plugins.size()} plugins${changedFiles?' of changed files '+changedFiles:''}")
 		plugins.each { plugin ->
 			log.debug("Firing onConfigChange event for plugin ${plugin}")
-			pluginManager.getGrailsPlugin(plugin)?.notifyOfEvent(GrailsPlugin.EVENT_ON_CONFIG_CHANGE, null)
+			pluginManager.getGrailsPlugin(plugin)?.notifyOfEvent(GrailsPlugin.EVENT_ON_CONFIG_CHANGE, changedFiles)
 		}
     }
 	
@@ -30,7 +30,7 @@ class ReloadConfigService {
 		log.debug("Check now triggered")
 		
 		// Check for changes
-		def changed = false
+		def changed = []
 		files?.each { String fileName ->
 			if (fileName.contains("file:"))
 				fileName = fileName.substring(fileName.indexOf(':')+1)
@@ -39,7 +39,7 @@ class ReloadConfigService {
 			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
 				log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
 				grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
-				changed = true
+				changed << configFile
 			}
 		}
 		
@@ -48,7 +48,7 @@ class ReloadConfigService {
 		
 		// Notify plugins
 		if (changed) {
-			notifyPlugins();
+			notifyPlugins(changed);
 		}
 	}
 	

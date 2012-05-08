@@ -52,14 +52,9 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
-		compile 'net.sf.ezmorph:ezmorph:1.0.6', { excludes "commons-lang" }
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
-		compile('org.tmatesoft.svnkit:svnkit:1.3.5') {
-            excludes "jna", "trilead-ssh2", "sqljet"
-			export = false
-		}
     }
 	plugins {		
 		// Not exported
@@ -72,13 +67,12 @@ grails.project.dependency.resolution = {
 		test ':spock:0.6', {
 			export = false
 		}
-		build (':release:2.0.0.BUILD-SNAPSHOT') {
+		build (':release:2.0.0') {
 			export = false
-			excludes "svn"
+			excludes 'rest-client-builder'
 		}
-		build(':svn:1.0.2') {
+		build (':rest-client-builder:1.0.2') {
 			export = false
-			excludes "svnkit"
 		}
 	}
 }

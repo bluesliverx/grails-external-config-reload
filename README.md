@@ -32,7 +32,7 @@ If set to false, this will disable the polling job completely.  This may be used
 
 ### Notify Plugins
 
-This option is a list of plugin names (as in \["external-config-reload"\]) that should be notified when a configuration file has been modified.  This will fire the onConfigChange event for each plugin individually in the order that they are specified.  The default is not to notify any plugins.
+This option is a list of plugin names (as in \["external-config-reload"\]) that should be notified when a configuration file has been modified.  This will fire the onConfigChange event for each plugin individually in the order that they are specified.  The default is not to notify any plugins.  The event passed into the onConfigChange closure will have the "source" property loaded with all the changed configuration files detected.  Note that the source can be null if this is called through typical Grails means (Config.groovy is changed in development) or if something else calls the notifyPlugins method on the service without any parameters.
 
 
 ## Service
@@ -51,6 +51,8 @@ class SomeService {
 		reloadConfigService.reloadNow()
 		// OR...
 		reloadConfigService.notifyPlugins()
+		// OR...
+		reloadConfigService.notifyPlugins([new File("my-config.groovy"), new File("other-file.properties")])
 	}
 }
 ```
@@ -62,10 +64,14 @@ This triggers a check to be run on all watched files.  If a file has been modifi
 This triggers a manual reload.  All configuration files that are being watched will be reloaded and merged into the current configuration, and plugins will be notified.
 
 ### Notify Plugins
-This works exactly the same as if the configuration were changed, but no new configuration is loaded with this method.  The onConfigChange event for each plugin specified in the configuration is called.
+This works exactly the same as if the configuration were changed, but no new configuration is loaded with this method.  The onConfigChange event for each plugin specified in the configuration is called.  The optional list of files changed can be passed in for more information in the onConfigChange event.
 
 
 ## Release Notes
+
+### 1.1.0
+
+* Added list of changed files as the event source when onConfigChange event is fired.
 
 ### 1.0.1
 

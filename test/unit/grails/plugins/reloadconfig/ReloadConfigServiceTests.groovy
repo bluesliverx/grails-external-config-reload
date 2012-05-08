@@ -1,25 +1,12 @@
 package grails.plugins.reloadconfig
 
-import grails.test.*
+import grails.test.mixin.*
 import org.codehaus.groovy.grails.plugins.*
 import org.codehaus.groovy.grails.commons.*
 
-class ReloadConfigServiceTests extends GrailsUnitTestCase {
-    protected void setUp() {
-        super.setUp()
-		mockLogging(ReloadConfigService)
-		registerMetaClass(ReloadConfigService)
-		registerMetaClass(DefaultGrailsPlugin)
-		registerMetaClass(DefaultGrailsPluginManager)
-		registerMetaClass(File)
-    }
-
-    protected void tearDown() {
-        super.tearDown()
-    }
-	
+@TestFor(ReloadConfigService)
+class ReloadConfigServiceTests {
 	void testSetPlugins() {
-		ReloadConfigService service = new ReloadConfigService()
 		assertNull service.plugins
 		
 		service.plugins = null
@@ -78,34 +65,28 @@ class ReloadConfigServiceTests extends GrailsUnitTestCase {
     }
 	
 	void testCheckNow() {
-		def firstExists = true
+		def curDate = new Date()
+		
 		File.metaClass.exists = { ->
-			if (firstExists) {
-				firstExists = false
-				return true
-			}
-			return false
+			return delegate.name!="notExists"
 		}
-		def firstLastModified = true
 		File.metaClass.lastModified = { ->
-			if (firstLastModified) {
-				firstLastModified = false
-				return new Date().time
-			}
-			return 1
+			if (delegate.name=="existsChanged")
+				return curDate.time+1
+			return curDate.time-1
 		}
 		File.metaClass.getText = { ->
 			return "key1 = 'val1'"
 		}
 		
 		def notifyPluginsCalled = false
-		ReloadConfigService.metaClass.notifyPlugins = { ->
+		ReloadConfigService.metaClass.notifyPlugins = { List changedFiles=null ->
+			assert changedFiles.size()==1
+			assert changedFiles[0].name=="existsChanged"
 			notifyPluginsCalled = true
 		}
 		
 		
-		def curDate = new Date()
-		def service = new ReloadConfigService()
 		service.grailsApplication = [config:[merge:{ ConfigObject config ->
 			assertEquals 1, config.size()
 			assertEquals "val1", config.key1
@@ -125,7 +106,6 @@ class ReloadConfigServiceTests extends GrailsUnitTestCase {
 			notifyPluginsCalled = true
 		}
 		
-		def service = new ReloadConfigService()
 		assertNull service.lastTimeChecked
 		service.checkNow()
 		assertNotNull service.lastTimeChecked
@@ -151,7 +131,6 @@ class ReloadConfigServiceTests extends GrailsUnitTestCase {
 		}
 		
 		def curDate = new Date()
-		def service = new ReloadConfigService()
 		service.grailsApplication = [config:[merge:{ ConfigObject config ->
 			assertEquals 1, config.size()
 			assertEquals "val1", config.key1
@@ -171,7 +150,6 @@ class ReloadConfigServiceTests extends GrailsUnitTestCase {
 			notifyPluginsCalled = true
 		}
 		
-		def service = new ReloadConfigService()
 		assertNull service.lastTimeChecked
 		service.reloadNow()
 		
