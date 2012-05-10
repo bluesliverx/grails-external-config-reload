@@ -99,7 +99,7 @@ class ReloadConfigServiceTests {
 		service.checkNow()
 				
 		assertTrue notifyPluginsCalled
-		assertTrue service.lastTimeChecked > curDate
+		assertTrue service.lastTimeChecked >= curDate
 		assert grailsApplication.config.key1=="val1"
 	}
 	
@@ -127,7 +127,7 @@ class ReloadConfigServiceTests {
 		service.checkNow()
 				
 		assertTrue notifyPluginsCalled
-		assertTrue service.lastTimeChecked > curDate
+		assertTrue service.lastTimeChecked >= curDate
 		assert !grailsApplication.config.containsKey("key1")
 	}
 	
@@ -169,7 +169,7 @@ class ReloadConfigServiceTests {
 		service.reloadNow()
 		
 		assertTrue notifyPluginsCalled
-		assertTrue service.lastTimeChecked > curDate
+		assertTrue service.lastTimeChecked >= curDate
 		assert grailsApplication.config.key1=="val1"
 	}
 	
@@ -193,7 +193,7 @@ class ReloadConfigServiceTests {
 		service.reloadNow()
 		
 		assertTrue notifyPluginsCalled
-		assertTrue service.lastTimeChecked > curDate
+		assertTrue service.lastTimeChecked >= curDate
 		assert !grailsApplication.config.containsKey("key1")
 	}
 	
