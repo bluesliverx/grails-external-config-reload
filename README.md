@@ -10,6 +10,7 @@ grails.plugins.reloadConfig.includeConfigLocations = true
 grails.plugins.reloadConfig.interval = 5000
 grails.plugins.reloadConfig.enabled = true
 grails.plugins.reloadConfig.notifyPlugins = []
+grails.plugins.reloadConfig.automerge = true
 ```
 
 Each of these options are described below.
@@ -34,6 +35,9 @@ If set to false, this will disable the polling job completely.  This may be used
 
 This option is a list of plugin names (as in \["external-config-reload"\]) that should be notified when a configuration file has been modified.  This will fire the onConfigChange event for each plugin individually in the order that they are specified.  The default is not to notify any plugins.  The event passed into the onConfigChange closure will have the "source" property loaded with all the changed configuration files detected.  Note that the source can be null if this is called through typical Grails means (Config.groovy is changed in development) or if something else calls the notifyPlugins method on the service without any parameters.
 
+### Automerge
+
+This option, which defaults to true, can be set to false to not automatically load and merge the configuration files into the current application configuration when a reload is triggered (either through a reloadNow or a polling check).  This is designed to allow a user to add custom handling of configuration files in the onConfigChange event in their plugin.  This also allows the user to parse and merge configuration which is not ConfigSlurper compatible groovy, such as XML files or others.
 
 ## Service
 
@@ -68,6 +72,10 @@ This works exactly the same as if the configuration were changed, but no new con
 
 
 ## Release Notes
+
+### 1.2.0
+
+* Fixed #8 for adding the automerge configuration parameter.
 
 ### 1.1.0
 

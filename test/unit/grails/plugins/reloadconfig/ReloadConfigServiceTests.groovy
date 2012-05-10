@@ -1,11 +1,20 @@
 package grails.plugins.reloadconfig
 
+import org.junit.*
+import static org.junit.Assert.*
 import grails.test.mixin.*
 import org.codehaus.groovy.grails.plugins.*
 import org.codehaus.groovy.grails.commons.*
 
 @TestFor(ReloadConfigService)
 class ReloadConfigServiceTests {
+	@Before
+	void setup() {
+		grailsApplication.config.remove("key1")
+		grailsApplication.config.grails.plugins.reloadConfig.automerge = true
+		service.grailsApplication = grailsApplication
+	}
+
 	void testSetPlugins() {
 		assertNull service.plugins
 		
@@ -51,9 +60,7 @@ class ReloadConfigServiceTests {
 //		pluginMock.verify()
 //    }
 
-    void testNotifyPluginsDoesNotExist() {
-		ReloadConfigService service = new ReloadConfigService()
-		
+    void testNotifyPluginsDoesNotExist() {		
 		DefaultGrailsPluginManager.metaClass.getGrailsPlugin = { String plugin ->
 			assertEquals "external-config-reload", plugin
 			return null
@@ -86,11 +93,6 @@ class ReloadConfigServiceTests {
 			notifyPluginsCalled = true
 		}
 		
-		
-		service.grailsApplication = [config:[merge:{ ConfigObject config ->
-			assertEquals 1, config.size()
-			assertEquals "val1", config.key1
-		}]]
 		service.files = ["file:existsNotChanged", "notExists", "file:existsChanged"]
 		service.lastTimeChecked = curDate
 		
@@ -98,6 +100,35 @@ class ReloadConfigServiceTests {
 				
 		assertTrue notifyPluginsCalled
 		assertTrue service.lastTimeChecked > curDate
+		assert grailsApplication.config.key1=="val1"
+	}
+	
+	void testCheckNowNoAutomerge() {
+		grailsApplication.config.grails.plugins.reloadConfig.automerge = false
+		
+		def curDate = new Date()
+		File.metaClass.exists = { ->
+			return true
+		}
+		File.metaClass.lastModified = { ->
+			return curDate.time+1
+		}
+		
+		def notifyPluginsCalled = false
+		ReloadConfigService.metaClass.notifyPlugins = { List changedFiles=null ->
+			assert changedFiles.size()==1
+			assert changedFiles[0].name=="existsChanged"
+			notifyPluginsCalled = true
+		}
+		
+		service.files = ["file:existsChanged"]
+		service.lastTimeChecked = curDate
+		
+		service.checkNow()
+				
+		assertTrue notifyPluginsCalled
+		assertTrue service.lastTimeChecked > curDate
+		assert !grailsApplication.config.containsKey("key1")
 	}
 	
 	void testCheckNowNoFiles() {
@@ -131,10 +162,7 @@ class ReloadConfigServiceTests {
 		}
 		
 		def curDate = new Date()
-		service.grailsApplication = [config:[merge:{ ConfigObject config ->
-			assertEquals 1, config.size()
-			assertEquals "val1", config.key1
-		}]]
+		
 		service.files = ["file:existsNotChanged", "notExists", "file:existsChanged"]
 		service.lastTimeChecked = curDate
 		
@@ -142,6 +170,31 @@ class ReloadConfigServiceTests {
 		
 		assertTrue notifyPluginsCalled
 		assertTrue service.lastTimeChecked > curDate
+		assert grailsApplication.config.key1=="val1"
+	}
+	
+	void testReloadNowNoAutomerge() {
+		grailsApplication.config.grails.plugins.reloadConfig.automerge = false
+		
+		File.metaClass.exists = { ->
+			return true
+		}
+		
+		def notifyPluginsCalled = false
+		ReloadConfigService.metaClass.notifyPlugins = { ->
+			notifyPluginsCalled = true
+		}
+		
+		def curDate = new Date()
+		
+		service.files = ["file:existsChanged"]
+		service.lastTimeChecked = curDate
+		
+		service.reloadNow()
+		
+		assertTrue notifyPluginsCalled
+		assertTrue service.lastTimeChecked > curDate
+		assert !grailsApplication.config.containsKey("key1")
 	}
 	
 	void testReloadNowNoFiles() {

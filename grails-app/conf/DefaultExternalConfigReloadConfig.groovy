@@ -6,6 +6,7 @@ grails {
 			interval = 5000
 			enabled = true
 			notifyPlugins = []
+			automerge = true
 		}
 	}
 }
