@@ -73,6 +73,10 @@ This works exactly the same as if the configuration were changed, but no new con
 
 ## Release Notes
 
+### 1.2.1
+
+* Fixed #9 to default the automerge option to true.
+
 ### 1.2.0
 
 * Fixed #8 for adding the automerge configuration parameter.
