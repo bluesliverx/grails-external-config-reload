@@ -108,6 +108,7 @@ Please note: No warranty is implied or given with this plugin.
 			plugins = reloadConf.notifyPlugins
 			files = watchedFiles
 			lastTimeChecked = new Date()
+			automerge = reloadConf.automerge
         }
     }
 }

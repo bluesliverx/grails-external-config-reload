@@ -9,6 +9,7 @@ class ReloadConfigService {
 	List files
 	Date lastTimeChecked
 	ReloadableTimer timer
+	Boolean automerge
 
 	// Notify plugins list - add external-config-reload automatically	
 	private def plugins
@@ -38,7 +39,7 @@ class ReloadConfigService {
 			log.debug("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
 			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
 				log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
-				if (grailsApplication.config.grails.plugins.reloadConfig.automerge)
+				if (automerge)
 					grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
 				changed << configFile
 			}
@@ -60,7 +61,7 @@ class ReloadConfigService {
 				fileName = fileName.substring(fileName.indexOf(':')+1)
 			File configFile = new File(fileName).absoluteFile
 			if (configFile.exists()) {
-				if (grailsApplication.config.grails.plugins.reloadConfig.automerge) {
+				if (automerge) {
 					log.debug("Reloading ${configFile} manually")
 					grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
 				} else

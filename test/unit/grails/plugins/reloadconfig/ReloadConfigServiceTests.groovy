@@ -11,7 +11,7 @@ class ReloadConfigServiceTests {
 	@Before
 	void setup() {
 		grailsApplication.config.remove("key1")
-		grailsApplication.config.grails.plugins.reloadConfig.automerge = true
+		service.automerge = true
 		service.grailsApplication = grailsApplication
 	}
 
@@ -104,7 +104,7 @@ class ReloadConfigServiceTests {
 	}
 	
 	void testCheckNowNoAutomerge() {
-		grailsApplication.config.grails.plugins.reloadConfig.automerge = false
+		service.automerge = false
 		
 		def curDate = new Date()
 		File.metaClass.exists = { ->
@@ -174,7 +174,7 @@ class ReloadConfigServiceTests {
 	}
 	
 	void testReloadNowNoAutomerge() {
-		grailsApplication.config.grails.plugins.reloadConfig.automerge = false
+		service.automerge = false
 		
 		File.metaClass.exists = { ->
 			return true
