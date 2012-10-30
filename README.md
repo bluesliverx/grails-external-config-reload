@@ -73,6 +73,10 @@ This works exactly the same as if the configuration were changed, but no new con
 
 ## Release Notes
 
+### 1.2.2
+
+* Fixed #10 to not do multiple notifications for a single watched file.
+
 ### 1.2.1
 
 * Fixed #9 to default the automerge option to true.

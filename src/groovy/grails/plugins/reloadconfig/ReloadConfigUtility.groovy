@@ -29,7 +29,7 @@ class ReloadConfigUtility {
 	}
 	
 	public static void configureWatcher(ConfigObject reloadConf, application, boolean restart=false) {
-		def reloadConfigService = application.mainContext.getBean("reloadConfigService")
+		def reloadConfigService = (ReloadConfigService)application.mainContext.getBean("reloadConfigService")
 		if (reloadConf.enabled) {
 			def interval = reloadConf.interval
 			if (!reloadConfigService.timer) {

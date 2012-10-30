@@ -100,8 +100,10 @@ Please note: No warranty is implied or given with this plugin.
 	
 	def configureServiceBean = { reloadConf, application ->
 		def watchedFiles = reloadConf.files
-		if (reloadConf.includeConfigLocations && application.config.grails.config.locations)
+		if (reloadConf.includeConfigLocations && application.config.grails.config.locations) {
 			watchedFiles.addAll(application.config.grails.config.locations)
+			watchedFiles = watchedFiles.unique()
+		}
 		reloadConfigService(ReloadConfigService) {bean ->
             bean.autowire = "byName"
             bean.scope = "singleton"
