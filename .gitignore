@@ -11,3 +11,4 @@ plugin.xml
 .link_to_grails_plugins
 .idea
 *.iml
+web-app
