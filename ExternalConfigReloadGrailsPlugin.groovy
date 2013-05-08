@@ -5,7 +5,7 @@ import grails.util.Environment;
 
 class ExternalConfigReloadGrailsPlugin {
     // the plugin version
-    def version = "1.2-SNAPSHOT"
+    def version = "1.3-SNAPSHOT"
     
 	// the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
@@ -68,6 +68,7 @@ Please note: No warranty is implied or given with this plugin.
 		reloadConfigService.files = watchedFiles
 		reloadConfigService.lastTimeChecked = new Date()
 		reloadConfigService.automerge = reloadConf.automerge
+		reloadConfigService.notifyWithConfig = reloadConf.notifyWithConfig
 		ReloadConfigUtility.configureWatcher(reloadConf, application)
     }
 
@@ -102,7 +103,7 @@ Please note: No warranty is implied or given with this plugin.
 		reloadConfigService.files = watchedFiles
 		reloadConfigService.lastTimeChecked = new Date()
 		reloadConfigService.automerge = reloadConf.automerge
-
+		reloadConfigService.notifyWithConfig = reloadConf.notifyWithConfig
 		ReloadConfigUtility.configureWatcher(reloadConf, event.application, true)
     }
 

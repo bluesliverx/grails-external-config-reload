@@ -7,6 +7,7 @@ grails {
 			enabled = true
 			notifyPlugins = []
 			automerge = true
+			notifyWithConfig = true
 		}
 	}
 }

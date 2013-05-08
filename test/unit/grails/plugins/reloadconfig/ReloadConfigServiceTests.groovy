@@ -35,31 +35,6 @@ class ReloadConfigServiceTests {
 		assertEquals "external-config-reload", service.plugins[1]
 	}
 
-	// Not working due to mocking, removing for now
-//    void testNotifyPlugins() {
-//		ReloadConfigService service = new ReloadConfigService()
-//		
-//		def notifyCalled = false
-//		def pluginMock = mockFor(GrailsPlugin)
-//		pluginMock.demand.notifyOfEvent { int event, Object source ->
-//			assertEquals event, GrailsPlugin.EVENT_ON_CONFIG_CHANGE
-//			assertNull source
-//			notifyCalled = true
-//			return [:]
-//		}
-//		
-//		DefaultGrailsPluginManager.metaClass.getGrailsPlugin = { String plugin ->
-//			assertEquals "external-config-reload", plugin
-//			return pluginMock.createMock()
-//		}
-//		
-//		service.plugins = []
-//		service.pluginManager = new DefaultGrailsPluginManager("", new DefaultGrailsApplication())
-//		service.notifyPlugins();
-//		
-//		pluginMock.verify()
-//    }
-
     void testNotifyPluginsDoesNotExist() {		
 		DefaultGrailsPluginManager.metaClass.getGrailsPlugin = { String plugin ->
 			assertEquals "external-config-reload", plugin

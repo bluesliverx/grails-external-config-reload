@@ -10,6 +10,7 @@ class ReloadConfigService {
 	Date lastTimeChecked
 	ReloadableTimer timer
 	Boolean automerge
+	Boolean notifyWithConfig
 
 	// Notify plugins list - add external-config-reload automatically	
 	private def plugins
@@ -23,7 +24,9 @@ class ReloadConfigService {
 		log.debug("Notifying ${plugins.size()} plugins${changedFiles?' of changed files '+changedFiles:''}")
 		plugins.each { plugin ->
 			log.debug("Firing onConfigChange event for plugin ${plugin}")
-			pluginManager.getGrailsPlugin(plugin)?.notifyOfEvent(GrailsPlugin.EVENT_ON_CONFIG_CHANGE, changedFiles)
+			pluginManager.getGrailsPlugin(plugin)?.notifyOfEvent(GrailsPlugin.EVENT_ON_CONFIG_CHANGE,
+					notifyWithConfig ? grailsApplication.config : changedFiles
+			)
 		}
     }
 	
