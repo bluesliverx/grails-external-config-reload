@@ -109,7 +109,7 @@ Please note: No warranty is implied or given with this plugin.
 	private List getWatchedFiles(reloadConf, application) {
 		def watchedFiles = reloadConf.files
 		if (reloadConf.includeConfigLocations && application.config.grails.config.locations) {
-			watchedFiles.addAll(application.config.grails.config.locations)
+			watchedFiles.addAll(application.config.grails.config.locations.findAll { !(it instanceof Class) })
 			watchedFiles = watchedFiles.unique()
 		}
 		return watchedFiles
