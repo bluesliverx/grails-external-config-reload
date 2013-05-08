@@ -62,6 +62,12 @@ Please note: No warranty is implied or given with this plugin.
 
     def doWithApplicationContext = { applicationContext ->
 		def reloadConf = ReloadConfigUtility.loadConfig(application)
+		def watchedFiles = getWatchedFiles(reloadConf, application)
+		def reloadConfigService = applicationContext.getBean('reloadConfigService')
+		reloadConfigService.plugins = reloadConf.notifyPlugins
+		reloadConfigService.files = watchedFiles
+		reloadConfigService.lastTimeChecked = new Date()
+		reloadConfigService.automerge = reloadConf.automerge
 		ReloadConfigUtility.configureWatcher(reloadConf, application)
     }
 
@@ -88,29 +94,31 @@ Please note: No warranty is implied or given with this plugin.
     def onConfigChange = { event ->
 		// Reload config service and watcher job
 		def reloadConf = ReloadConfigUtility.loadConfig(event.application)
-		if (event.ctx.getBean('reloadConfigService')?.timer?.cancelSchedule())
+		def watchedFiles = getWatchedFiles(reloadConf, event.application)
+		def reloadConfigService = event.ctx.getBean('reloadConfigService')
+		if (reloadConfigService?.timer?.cancelSchedule())
 			log.info "Stopped configuration file watcher"
-		def beans = beans {
-			configureServiceBean.delegate = delegate
-			configureServiceBean(reloadConf, event.application)
-		}
-		event.ctx.registerBeanDefinition("reloadConfigService", beans.getBeanDefinition("reloadConfigService"))
+		reloadConfigService.plugins = reloadConf.notifyPlugins
+		reloadConfigService.files = watchedFiles
+		reloadConfigService.lastTimeChecked = new Date()
+		reloadConfigService.automerge = reloadConf.automerge
+
 		ReloadConfigUtility.configureWatcher(reloadConf, event.application, true)
     }
-	
-	def configureServiceBean = { reloadConf, application ->
+
+	private List getWatchedFiles(reloadConf, application) {
 		def watchedFiles = reloadConf.files
 		if (reloadConf.includeConfigLocations && application.config.grails.config.locations) {
 			watchedFiles.addAll(application.config.grails.config.locations)
 			watchedFiles = watchedFiles.unique()
 		}
+		return watchedFiles
+	}
+	
+	def configureServiceBean = { reloadConf, application ->
 		reloadConfigService(ReloadConfigService) {bean ->
             bean.autowire = "byName"
             bean.scope = "singleton"
-			plugins = reloadConf.notifyPlugins
-			files = watchedFiles
-			lastTimeChecked = new Date()
-			automerge = reloadConf.automerge
         }
     }
 }
