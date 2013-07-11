@@ -42,8 +42,20 @@ class ReloadConfigService {
 			log.debug("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
 			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
 				log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
-				if (automerge)
-					grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
+				if (automerge) {
+					ConfigSlurper configSlurper = new ConfigSlurper(Environment.getCurrent().getName())
+					ConfigObject updatedConfig
+					if (fileName?.toLowerCase()?.endsWith(".properties")) {
+						def props = new Properties()
+						configFile.withInputStream { stream ->
+							props.load(stream)
+						}
+						updatedConfig = configSlurper.parse(props)
+					} else {
+						updatedConfig = configSlurper.parse(configFile.text)
+					}
+					grailsApplication.config.merge(updatedConfig)
+				}
 				changed << configFile
 			}
 		}
@@ -66,7 +78,18 @@ class ReloadConfigService {
 			if (configFile.exists()) {
 				if (automerge) {
 					log.debug("Reloading ${configFile} manually")
-					grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
+					ConfigSlurper configSlurper = new ConfigSlurper(Environment.getCurrent().getName())
+					ConfigObject updatedConfig
+					if (fileName?.toLowerCase()?.endsWith(".properties")) {
+						def props = new Properties()
+						configFile.withInputStream { stream ->
+							props.load(stream)
+						}
+						updatedConfig = configSlurper.parse(props)
+					} else {
+						updatedConfig = configSlurper.parse(configFile.text)
+					}
+					grailsApplication.config.merge(updatedConfig)
 				} else
 					log.debug("Not performing auto merge of ${configFile} due to configuration")
 			} else {
@@ -77,3 +100,4 @@ class ReloadConfigService {
 		notifyPlugins();
 	}
 }
+
