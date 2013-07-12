@@ -42,8 +42,12 @@ class ReloadConfigService {
 			log.debug("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
 			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
 				log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
-				if (automerge)
-					grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
+				try {
+					if (automerge)
+						grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
+				} catch (Throwable e) {
+					log.error("Failed parsing and merging config file ${configFile} changes", e)
+				}
 				changed << configFile
 			}
 		}
@@ -65,8 +69,12 @@ class ReloadConfigService {
 			File configFile = new File(fileName).absoluteFile
 			if (configFile.exists()) {
 				if (automerge) {
-					log.debug("Reloading ${configFile} manually")
-					grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
+					try {
+						log.debug("Reloading ${configFile} manually")
+						grailsApplication.config.merge(new ConfigSlurper(Environment.getCurrent().getName()).parse(configFile.text))
+					} catch (Throwable e) {
+						log.error("Failed parsing and merging config file ${configFile} changes", e)
+					}
 				} else
 					log.debug("Not performing auto merge of ${configFile} due to configuration")
 			} else {
