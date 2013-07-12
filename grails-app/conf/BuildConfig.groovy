@@ -57,7 +57,9 @@ grails.project.dependency.resolution = {
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
 
-		test "org.spockframework:spock-grails-support:0.7-groovy-2.0"
+		test "org.spockframework:spock-grails-support:0.7-groovy-2.0", {
+			export = false
+		}
     }
 	plugins {		
 		// Not exported
