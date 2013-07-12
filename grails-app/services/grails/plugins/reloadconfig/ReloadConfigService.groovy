@@ -21,7 +21,7 @@ class ReloadConfigService {
 	}
 
     def notifyPlugins(List changedFiles=null) {
-		log.debug("Notifying ${plugins.size()} plugins${changedFiles?' of changed files '+changedFiles:''}")
+		log.trace("Notifying ${plugins.size()} plugins${changedFiles?' of changed files '+changedFiles:''}")
 		plugins.each { plugin ->
 			log.debug("Firing onConfigChange event for plugin ${plugin}")
 			pluginManager.getGrailsPlugin(plugin)?.notifyOfEvent(GrailsPlugin.EVENT_ON_CONFIG_CHANGE,
@@ -31,7 +31,7 @@ class ReloadConfigService {
     }
 	
 	def checkNow() {
-		log.debug("Check now triggered")
+		log.trace("Check now triggered")
 		
 		// Check for changes
 		def changed = []
@@ -39,7 +39,7 @@ class ReloadConfigService {
 			if (fileName.contains("file:"))
 				fileName = fileName.substring(fileName.indexOf(':')+1)
 			File configFile = new File(fileName).absoluteFile
-			log.debug("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
+			log.trace("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
 			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
 				log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
 				try {
