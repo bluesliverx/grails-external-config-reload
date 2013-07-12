@@ -60,6 +60,10 @@ grails.project.dependency.resolution = {
 		test "org.spockframework:spock-grails-support:0.7-groovy-2.0", {
 			export = false
 		}
+		build ("org.codehaus.groovy.modules.http-builder:http-builder:0.5.0") {
+			excludes "commons-logging", "xml-apis", "groovy"
+			export = false
+		}
     }
 	plugins {		
 		// Not exported
