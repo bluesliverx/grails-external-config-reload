@@ -8,6 +8,7 @@ class ReloadConfigService {
 	def grailsApplication
 	List files
 	Date lastTimeChecked
+	Date lastTimeReloaded
 	ReloadableTimer timer
 	Boolean automerge
 	Boolean notifyWithConfig
@@ -67,6 +68,7 @@ class ReloadConfigService {
 		
 		// Notify plugins
 		if (changed) {
+			lastTimeReloaded = new Date();
 			notifyPlugins(changed);
 		}
 	}
@@ -102,6 +104,7 @@ class ReloadConfigService {
 				log.warn("File ${configFile} does not exist, cannot reload")
 			}
 		}
+		lastTimeReloaded = new Date();
 		lastTimeChecked = new Date();
 		notifyPlugins();
 	}
