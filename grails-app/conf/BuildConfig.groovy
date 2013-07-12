@@ -63,21 +63,21 @@ grails.project.dependency.resolution = {
     }
 	plugins {		
 		// Not exported
-		test ':code-coverage:1.2.4', {
+		test ':code-coverage:1.2.6', {
 			export = false
 		}
-		test ':codenarc:0.15', {
+		test ':codenarc:0.18.1', {
 			export = false
 		}
 		test(":spock:0.7") {
 			export = false
 			exclude "spock-grails-support"
 		}
-		build (':release:2.0.4') {
+		build (':release:2.2.1') {
 			export = false
 			excludes 'rest-client-builder'
 		}
-		build (':rest-client-builder:1.0.2') {
+		build (':rest-client-builder:1.0.3') {
 			export = false
 		}
 	}
