@@ -87,6 +87,9 @@ class SomeService {
 		reloadConfigService.notifyPlugins()
 		// OR...
 		reloadConfigService.notifyPlugins([new File("my-config.groovy"), new File("other-file.properties")])
+
+		// Know the last time the config files were reloaded (triggered by reloadNow or when changes occurred)
+		reloadConfigService.getLastTimeReloaded()
 	}
 }
 ```
@@ -109,6 +112,15 @@ of the list of changed files set as input to the method.
 
 
 ## Release Notes
+
+### 1.4.0
+
+* Special thanks to erezool for fixing many of the issues with this release and for contributions!
+* Fixed #14 spock dependency no longer leaks from the plugin
+* (erezool) Fixed #15 no longer crash when the config file cannot be loaded for any reason
+* Fixed #16 to add the "lastTimeReloaded" property to reload config service
+* (erezool) Fixed #17 support for properties files instead of just groovy config files
+* Fixed #19 decrease logging threshold to trace on many common logging statements
 
 ### 1.3.0
 
