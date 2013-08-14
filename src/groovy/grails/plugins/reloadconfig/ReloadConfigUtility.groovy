@@ -2,12 +2,12 @@ package grails.plugins.reloadconfig
 
 import grails.util.Environment
 import groovy.util.ConfigObject;
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.commons.GrailsApplication;
-import org.apache.log4j.Logger
 
+@Slf4j
 class ReloadConfigUtility {
-	private static Logger log = Logger.getLogger(this)
-	
+
 	// Borrowed from spring security
 	public static ConfigObject loadConfig(GrailsApplication application) {
 		GroovyClassLoader classLoader = new GroovyClassLoader(ReloadConfigUtility.class.getClassLoader());
