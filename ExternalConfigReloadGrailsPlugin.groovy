@@ -5,7 +5,7 @@ import grails.util.Environment;
 
 class ExternalConfigReloadGrailsPlugin {
     // the plugin version
-    def version = "1.4-SNAPSHOT"
+    def version = "1.4.1"
     
 	// the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"

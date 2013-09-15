@@ -113,6 +113,10 @@ of the list of changed files set as input to the method.
 
 ## Release Notes
 
+### 1.4.1
+
+* Fixed #22 removed dependency on log4j and replaced with slfj4 (thanks to herom for the pull request!)
+
 ### 1.4.0
 
 * Special thanks to erezool for fixing many of the issues with this release and for contributions!
