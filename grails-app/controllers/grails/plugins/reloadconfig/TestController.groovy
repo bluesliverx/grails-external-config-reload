@@ -12,6 +12,6 @@ class TestController {
 	}
 	
 	def reloadNow = {
-		reloadConfigService.reloadNow()
+		reloadConfigService.checkNow(true)
 	}
 }

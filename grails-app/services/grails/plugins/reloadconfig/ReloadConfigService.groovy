@@ -1,8 +1,13 @@
 package grails.plugins.reloadconfig
 
-import org.codehaus.groovy.grails.plugins.GrailsPlugin
+import grails.plugins.GrailsPlugin
 import grails.util.Environment
+import groovy.util.logging.Slf4j
+import org.grails.config.PropertySourcesConfig
+import org.grails.config.yaml.YamlPropertySourceLoader
+import org.springframework.core.io.FileSystemResource
 
+@Slf4j
 class ReloadConfigService {
 	def pluginManager
 	def grailsApplication
@@ -31,31 +36,50 @@ class ReloadConfigService {
 		}
     }
 	
-	def checkNow() {
+	def checkNow(boolean forceReload = false) {
 		log.trace("Check now triggered")
-		
-		// Check for changes
+
 		def changed = []
 		files?.each { String fileName ->
 			if (fileName.contains("file:"))
 				fileName = fileName.substring(fileName.indexOf(':')+1)
 			File configFile = new File(fileName).absoluteFile
 			log.trace("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
-			if (configFile.exists() && configFile.lastModified()>lastTimeChecked.time) {
-				log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
+
+			if (!automerge) {
+				log.debug("Not performing auto merge of ${configFile} due to configuration")
+				return
+			}
+
+			if (!configFile.exists()) {
+				log.warn("File ${configFile} does not exist, cannot reload")
+				return
+			}
+
+			if (forceReload || configFile.lastModified() > lastTimeChecked.time) {
+				if (forceReload) {
+					log.info("Forcing reload of configuration")
+				} else if (configFile.lastModified() > lastTimeChecked.time) {
+					log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
+				}
+
 				try {
 					ConfigSlurper configSlurper = new ConfigSlurper(Environment.getCurrent().getName())
-					ConfigObject updatedConfig
-					if (fileName?.toLowerCase()?.endsWith(".properties")) {
+					String fileExtension = getFileExtension(fileName)
+					if (fileExtension == "properties") {
 						def props = new Properties()
 						configFile.withInputStream { stream ->
 							props.load(stream)
 						}
-						updatedConfig = configSlurper.parse(props)
+						grailsApplication.config.merge(configSlurper.parse(props))
+					} else if (fileExtension in ['yml', 'yaml']) {
+						def resource = new FileSystemResource(configFile)
+						def mapPropertySource = new YamlPropertySourceLoader().load(fileName, resource, null)
+						grailsApplication.config.merge(new PropertySourcesConfig(mapPropertySource.getSource()))
+
 					} else {
-						updatedConfig = configSlurper.parse(configFile.text)
+						grailsApplication.config.merge(configSlurper.parse(configFile.text))
 					}
-					grailsApplication.config.merge(updatedConfig)
 				} catch (Throwable e) {
 					log.error("Failed parsing and merging config file ${configFile} changes", e)
 				}
@@ -67,46 +91,14 @@ class ReloadConfigService {
 		lastTimeChecked = new Date()
 		
 		// Notify plugins
-		if (changed) {
+		if (changed || forceReload) {
 			lastTimeReloaded = new Date();
 			notifyPlugins(changed);
 		}
 	}
-	
-	def reloadNow() {
-		log.info("Manual reload of configuration files triggered")
-		files?.each { String fileName ->
-			if (fileName.contains("file:"))
-				fileName = fileName.substring(fileName.indexOf(':')+1)
-			File configFile = new File(fileName).absoluteFile
-			if (configFile.exists()) {
-				if (automerge) {
-					try {
-						log.debug("Reloading ${configFile} manually")
-						ConfigSlurper configSlurper = new ConfigSlurper(Environment.getCurrent().getName())
-						ConfigObject updatedConfig
-						if (fileName?.toLowerCase()?.endsWith(".properties")) {
-							def props = new Properties()
-							configFile.withInputStream { stream ->
-								props.load(stream)
-							}
-							updatedConfig = configSlurper.parse(props)
-						} else {
-							updatedConfig = configSlurper.parse(configFile.text)
-						}
-						grailsApplication.config.merge(updatedConfig)
-					} catch (Throwable e) {
-						log.error("Failed parsing and merging config file ${configFile} changes", e)
-					}
-				} else
-					log.debug("Not performing auto merge of ${configFile} due to configuration")
-			} else {
-				log.warn("File ${configFile} does not exist, cannot reload")
-			}
-		}
-		lastTimeReloaded = new Date();
-		lastTimeChecked = new Date();
-		notifyPlugins();
+
+	private static String getFileExtension(String fileName) {
+		fileName?.toLowerCase()?.tokenize('.')[-1]
 	}
 }
 
