@@ -1,0 +1,12 @@
+sudo: false
+language: groovy
+jdk:
+  - oraclejdk8
+script:
+  - ./gradlew bintrayUpload
+env:
+  global:
+    #travis encrypt -a env.global BINTRAY_USER=...
+    #travis encrypt -a env.global BINTRAY_KEY=...
+    - secure: FM0o5LgY0vCH1TkzVyx6ZQdDaGXNwIv3JCkG6XjnxvwJ8xInDu6rCyHM9JOA6K6FMHySX99j8vwLieyj4zS1DZgGqrbl/lGOwe0kuqr2z/9AZGpNAHqI+VWIq4vS+Lrzu/TQYDYJCoD6PQaeKWaUrpaASaSHGE4k+jP190ZtwLM=
+    - secure: WDLX3ONZrLMl0dAyuVeRTlQszYkFmL6ZL4EIvWh62cuakmuHxg32CKCDafruUQOeCfyI98T9p8+VRPE2LDl2RDbFz1EVQvp1kf8TZU5+lVPPr52TQl2kbYgUUQhiKvZ5X3qpG7gOj62zctJmwkAEunEmxbntGmzYVgDwVqJAdEA=

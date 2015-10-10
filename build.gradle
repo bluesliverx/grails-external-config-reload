@@ -16,7 +16,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version "1.5-SNAPSHOT"
+version "2.0-SNAPSHOT"
 group "org.grails.plugins"
 
 apply plugin: 'maven-publish'
@@ -88,3 +88,27 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
+
+jar {
+    exclude "src/test/projects/**"
+}
+
+bintray {
+    pkg {
+        userOrg = 'bluesliverx'
+        repo = 'grails-plugins'
+        name = "org.grails.plugins:$project.name"
+        desc = "Grails External Configuration Reloading Plugin"
+        websiteUrl = "http://grails.org/plugin/$project.name"
+        issueTrackerUrl = "https://github.com/bluesliverx/grails-external-config-reload/issues"
+        vcsUrl = "https://github.com/bluesliverx/grails-external-config-reload"
+        licenses = ['Apache-2.0']
+        publicDownloadNumbers = true
+        version {
+            attributes = ['grails-plugin': "org.grails.plugins:$project.name"]
+            name = project.version
+        }
+    }
+}
+
+bintrayUpload.dependsOn build, sourcesJar, javadocJar
