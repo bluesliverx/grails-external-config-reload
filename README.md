@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bluesliverx/grails-external-config-reload.svg?branch=master)](https://travis-ci.org/bluesliverx/grails-external-config-reload)
+
 This plugin reloads external configuration files (those files added to grails.config.locations or additional arbitrary ones)
 based on a timer and then notifies any plugin specified of updates to the config files by firing the onConfigChange event.
 
@@ -112,6 +114,10 @@ of the list of changed files set as input to the method.
 
 
 ## Release Notes
+
+### 2.0
+
+* Grails 3 support (thanks to dtanner for upgrading the plugin!)
 
 ### 1.4.1
 

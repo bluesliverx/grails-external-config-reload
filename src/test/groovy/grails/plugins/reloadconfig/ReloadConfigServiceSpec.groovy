@@ -185,13 +185,8 @@ class ReloadConfigServiceSpec extends Specification {
 
 	def "Reload now"() {
 		given:
-		def firstExists = true
 		File.metaClass.exists = { ->
-			if (firstExists) {
-				firstExists = false
-				return true
-			}
-			return false
+			return delegate.name!="notExists"
 		}
 		File.metaClass.getText = { ->
 			return "key1 = 'val1'"
@@ -199,7 +194,7 @@ class ReloadConfigServiceSpec extends Specification {
 
 		and:
 		def notifyPluginsCalled = false
-		service.metaClass.notifyPlugins = { ->
+		service.metaClass.notifyPlugins = { List changed=null ->
 			notifyPluginsCalled = true
 		}
 
@@ -234,7 +229,7 @@ class ReloadConfigServiceSpec extends Specification {
 
 		and:
 		def notifyPluginsCalled = false
-		service.metaClass.notifyPlugins = { ->
+		service.metaClass.notifyPlugins = { List changed=null ->
 			notifyPluginsCalled = true
 		}
 
@@ -261,7 +256,7 @@ class ReloadConfigServiceSpec extends Specification {
 	def "Reload now no files"() {
 		given:
 		def notifyPluginsCalled = false
-		service.metaClass.notifyPlugins = { ->
+		service.metaClass.notifyPlugins = { List changed=null ->
 			notifyPluginsCalled = true
 		}
 

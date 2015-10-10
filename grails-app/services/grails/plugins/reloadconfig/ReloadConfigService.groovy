@@ -46,21 +46,22 @@ class ReloadConfigService {
 			File configFile = new File(fileName).absoluteFile
 			log.trace("Checking external config file location ${configFile} for changes since ${lastTimeChecked}...")
 
-			if (!automerge) {
-				log.debug("Not performing auto merge of ${configFile} due to configuration")
-				return
-			}
-
 			if (!configFile.exists()) {
 				log.warn("File ${configFile} does not exist, cannot reload")
 				return
 			}
 
-			if (forceReload || configFile.lastModified() > lastTimeChecked.time) {
+			if (forceReload || configFile.lastModified() > (lastTimeChecked?.time ?: 0l)) {
+				if (!automerge) {
+					log.debug("Not performing auto merge of ${configFile} due to configuration")
+					changed << configFile
+					return
+				}
 				if (forceReload) {
-					log.info("Forcing reload of configuration")
-				} else if (configFile.lastModified() > lastTimeChecked.time) {
+					log.info("Forcing reload of configuration in ${configFile.name}")
+				} else {
 					log.info("Detected changed configuration in ${configFile.name}, reloading configuration")
+					changed << configFile
 				}
 
 				try {
@@ -76,14 +77,12 @@ class ReloadConfigService {
 						def resource = new FileSystemResource(configFile)
 						def mapPropertySource = new YamlPropertySourceLoader().load(fileName, resource, null)
 						grailsApplication.config.merge(new PropertySourcesConfig(mapPropertySource.getSource()))
-
 					} else {
 						grailsApplication.config.merge(configSlurper.parse(configFile.text))
 					}
 				} catch (Throwable e) {
 					log.error("Failed parsing and merging config file ${configFile} changes", e)
 				}
-				changed << configFile
 			}
 		}
 		
