@@ -2,8 +2,14 @@ sudo: false
 language: groovy
 jdk:
   - oraclejdk8
-script:
-  - ./gradlew bintrayUpload
+script: "./travis-build.sh"
+branches:
+  only:
+    - master
+    - /^[0-9.]+.*$/
+before_script:
+  - rm -rf target
+  - rm -rf docs
 env:
   global:
     #travis encrypt -a env.global BINTRAY_USER=...
