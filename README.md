@@ -115,7 +115,11 @@ of the list of changed files set as input to the method.
 
 ## Release Notes
 
-### 2.0
+### 2.0.1
+
+* Fixed uber-jar being uploaded to binrtray (thanks to jglapa for the fix!)
+
+### 2.0.0
 
 * Grails 3 support (thanks to dtanner for upgrading the plugin!)
 
